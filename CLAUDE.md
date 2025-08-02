@@ -33,3 +33,55 @@ Ranking files contain popularity/usage data with Pokémon names in Japanese.
 - Uses uv for Python package management
 - All data files use Japanese Pokémon names
 - No external dependencies currently defined in pyproject.toml
+
+# 目標
+
+ポケモンの素早さクイズファイルを作成する。
+
+## 成果物の例
+
+「[暗記メーカー](https://ankimaker.com/)」で使えるCSVファイルを出力する。
+
+```
+question,answers,wrongChoices,explanation,ordered,generatedWrongChoices
+ミライドンの素早さ種族値,135,80;140;102,,,
+ライチュウの素早さ種族値,110,90;160;35,,,
+ライチュウ(アローラのすがた)の素早さ種族値,110,80;20;35,,,
+```
+
+## クイズの内容
+
+ポケモン種族名ごとの素早さ種族値を4択で答えさせる。
+
+1つの数値が正解で、残り3つが不正解。不正解は、他のポケモンの種族値のうち、正解でないものをランダムに抽出。
+
+## 生成元データ
+
+`dataset/basic/base_stats.csv` が種族値を含むCSVファイル。
+
+注意点として、ポケモン名に改行が含まれる場合がある。「コレクレー」について問題を作る場合、1行目の文字列に完全一致するエントリをすべて抽出する。そして、問題にする際は改行文字を削除する。問題「コレクレーはこフォルムの素早さ種族値」解答「10」問題「コレクレーとほフォルムの素早さ種族値」解答「80」のように、各エントリに対して別々のクイズを生成する。
+
+```
+No.,ポケモン,タイプ1,タイプ2,HP,攻撃,防御,特攻,特防,素早さ,合計
+999,"コレクレー
+はこフォルム",ゴースト,,45,30,70,75,70,10,300
+999,"コレクレー
+とほフォルム",ゴースト,,45,30,25,75,45,80,300
+1000,サーフゴー,はがね,ゴースト,87,60,95,133,91,84,550
+```
+
+`dataset/ranking/ranking_*.csv` が、よく使用されるポケモンのリストで、この中に含まれるポケモンすべてを抽出する。ヘッダ行がなく、各行は `順位,ポケモン` を表す。
+
+## 生成コマンド
+
+```bash
+uv run python generate_quiz.py OUTPUT INPUT...
+```
+
+実行例
+
+```bash
+uv run python generate_quiz.py quiz.csv dataset/ranking/ranking_33_*.csv
+```
+
+使用率ランキングは毎シーズン更新されるため、使用したいファイルをワイルドカードで指定する。
