@@ -43,7 +43,7 @@ def load_base_stats(csv_path):
     return pokemon_list
 
 
-def load_ranking_pokemon(ranking_files):
+def load_ranking_pokemon(ranking_files, rank_limit=None):
     """ランキングファイルからポケモン名のセットを作成"""
     ranking_pokemon = set()
     
@@ -52,8 +52,12 @@ def load_ranking_pokemon(ranking_files):
             reader = csv.reader(f)
             for row in reader:
                 if len(row) >= 2:
+                    rank = int(row[0])
                     pokemon_name = row[1].strip()
-                    ranking_pokemon.add(pokemon_name)
+                    
+                    # rank_limitが指定されている場合は、その順位以下のみを対象とする
+                    if rank_limit is None or rank <= rank_limit:
+                        ranking_pokemon.add(pokemon_name)
     
     return ranking_pokemon
 
@@ -129,6 +133,8 @@ def main():
     parser.add_argument('ranking_files', nargs='+', help='ランキングCSVファイル（複数可）')
     parser.add_argument('--base-stats', default='dataset/basic/base_stats.csv', 
                        help='基本種族値CSVファイル（デフォルト: dataset/basic/base_stats.csv）')
+    parser.add_argument('--rank-limit', type=int, 
+                       help='ランキングの指定順位までを対象とする')
     
     args = parser.parse_args()
     
@@ -139,7 +145,9 @@ def main():
     
     # ランキングデータを読み込み
     print(f"ランキングデータを読み込み中: {args.ranking_files}")
-    ranking_pokemon = load_ranking_pokemon(args.ranking_files)
+    if args.rank_limit:
+        print(f"ランキング制限: {args.rank_limit}位まで")
+    ranking_pokemon = load_ranking_pokemon(args.ranking_files, args.rank_limit)
     print(f"ランキングに含まれるポケモン数: {len(ranking_pokemon)}")
     
     # ランキングに含まれるポケモンのみを抽出

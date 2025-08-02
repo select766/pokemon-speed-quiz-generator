@@ -75,8 +75,10 @@ No.,ポケモン,タイプ1,タイプ2,HP,攻撃,防御,特攻,特防,素早さ,
 ## 生成コマンド
 
 ```bash
-uv run python generate_quiz.py OUTPUT INPUT...
+uv run python generate_quiz.py OUTPUT INPUT... [--rank-limit LIMIT]
 ```
+
+`--rank-limit`: ランキングの`LIMIT`位までを対象とする。
 
 実行例
 
